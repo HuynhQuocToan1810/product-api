@@ -70,11 +70,10 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/product-api:latest .
-
+          docker build -t huynhquoctoan1810/product-api:latest .
       - name: Push image to Docker Hub
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/product-api:latest
+          docker push huynhquoctoan1810/product-api:latest
 
       - name: Stop containers
         if: always()
