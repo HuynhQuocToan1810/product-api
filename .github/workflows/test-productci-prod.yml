@@ -1,0 +1,70 @@
+name: Product API Production CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Start MongoDB and Product API
+        run: docker compose up -d --build
+
+      - name: Check containers
+        run: docker compose ps
+
+      - name: Wait for Product API
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:3000/api/products; then
+              echo "Product API is ready"
+              exit 0
+            fi
+            echo "Waiting for Product API..."
+            sleep 2
+          done
+          echo "Product API did not start"
+          docker compose logs
+          exit 1
+
+      - name: Test GET products
+        run: |
+          curl -f http://localhost:3000/api/products
+
+      - name: Test POST product
+        run: |
+          curl -f -X POST http://localhost:3000/api/products \
+            -H "Content-Type: application/json" \
+            -d '{"pid":"CI001","pname":"CI Product","price":100000,"quantity":10}'
+
+      - name: Test GET product by pid
+        run: |
+          curl -f http://localhost:3000/api/products/CI001
+
+      - name: Test PUT product
+        run: |
+          curl -f -X PUT http://localhost:3000/api/products/CI001 \
+            -H "Content-Type: application/json" \
+            -d '{"pname":"Updated CI Product","price":200000,"quantity":20}'
+
+      - name: Test DELETE product
+        run: |
+          curl -f -X DELETE http://localhost:3000/api/products/CI001
+
+      - name: Stop containers
+        if: always()
+        run: docker compose down -v
