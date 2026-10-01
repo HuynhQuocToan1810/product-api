@@ -9,6 +9,11 @@ jobs:
   build-test-push-deploy:
     runs-on: self-hosted
 
+    defaults:
+      run:
+        shell: powershell -ExecutionPolicy Bypass -File {0}
+
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
