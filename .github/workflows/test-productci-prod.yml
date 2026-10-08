@@ -68,3 +68,6 @@ jobs:
       - name: Stop containers
         if: always()
         run: docker compose down -v
+      - name: Test GET products
+        run: |
+           curl -f http://localhost:3000/api/products
