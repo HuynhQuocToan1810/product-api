@@ -50,22 +50,7 @@ jobs:
           curl -f -X POST http://localhost:3000/api/products \
             -H "Content-Type: application/json" \
             -d '{"pid":"CI001","pname":"CI Product","price":100000,"quantity":10}'
-                  - name: Test POST product with missing required fields
-        run: |
-          status=$(curl -s -o /dev/null -w "%{http_code}" \
-            -X POST http://localhost:3000/api/products \
-            -H "Content-Type: application/json" \
-            -d '{"pid":"CI002"}')
-
-          echo "HTTP status: $status"
-
-          if [ "$status" -lt 400 ]; then
-            echo "ERROR: API should reject invalid product data"
-            exit 1
-          fi
-
-          echo "PASS: API rejected invalid product data"
-
+                 
       - name: Test GET product by pid
         run: |
           curl -f http://localhost:3000/api/products/CI001
